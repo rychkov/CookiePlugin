@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('add-rule').addEventListener('click', addNewRule);
   document.getElementById('save').addEventListener('click', saveConfig);
   const rulesContainer = document.getElementById('rules-container');
+  document.getElementById('export-config').addEventListener('click', exportConfig);
+  document.getElementById('import-config-input').addEventListener('change', importConfig);
   rulesContainer.addEventListener('click', handleRuleContainerClick);
   rulesContainer.addEventListener('change', handleRuleContainerChange);
 });
@@ -115,13 +117,56 @@ function addNewRule() {
 
 function saveConfig() {
   chrome.storage.local.set({ config }, () => {
-    const status = document.getElementById('status');
-    status.textContent = 'Configuration saved successfully!';
-    status.className = 'status success';
-    setTimeout(() => {
-      status.style.display = 'none';
-    }, 3000);
+    // The callback is required, but we don't need to do anything here.
   });
+}
+
+function exportConfig() {
+  const configString = JSON.stringify(config, null, 2);
+  const blob = new Blob([configString], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cookie-injector-config.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showStatus('Configuration exported.', 'success');
+}
+
+function importConfig(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const importedConfig = JSON.parse(e.target.result);
+      // Basic validation
+      if (importedConfig && Array.isArray(importedConfig.rules)) {
+        config = importedConfig;
+        chrome.storage.local.set({ config }); // Save directly
+        renderRules();
+        showStatus('Configuration imported successfully!', 'success');
+      } else {
+        throw new Error('Invalid config file format.');
+      }
+    } catch (error) {
+      showStatus(`Error importing file: ${error.message}`, 'error');
+    }
+  };
+  reader.readAsText(file);
+  // Reset file input to allow importing the same file again
+  event.target.value = '';
+}
+
+function showStatus(message, type) {
+  const status = document.getElementById('status');
+  status.textContent = message;
+  status.className = `status ${type}`;
 }
 
 // --- Event Handlers using Delegation ---
