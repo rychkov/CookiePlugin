@@ -62,6 +62,24 @@
     .btn-secondary:hover {
       background: #0b7dda;
     }
+    .btn-export {
+      background: #FF9800; /* Orange */
+    }
+    .btn-export:hover {
+      background: #fb8c00;
+    }
+    .btn-import {
+      display: inline-block;
+      padding: 6px 12px;
+      margin: 5px 5px 5px 0;
+      cursor: pointer;
+      border-radius: 3px;
+      background: #607D8B; /* Blue Grey */
+      color: white;
+    }
+    .btn-import:hover {
+      background: #546E7A; /* Darker Blue Grey */
+    }
     .cookie-item {
       background: white;
       padding: 8px;
@@ -96,8 +114,13 @@
   <h2>Cookie Injector Configuration</h2>
   <div id="status" class="status"></div>
   <div id="rules-container"></div>
-  <button id="add-rule" class="btn-secondary">+ Add New Rule</button>
-  <button id="save">Save Configuration</button>
+  <div class="main-actions">
+    <button id="add-rule" class="btn-secondary">+ Add New Rule</button>
+    <button id="save">Save Configuration</button>
+    <button id="export-config" class="btn-export">Export</button>
+    <label for="import-config-input" class="btn-import button">Import</label>
+    <input type="file" id="import-config-input" accept=".json" style="display: none;">
+  </div>
   
   <script src="popup.js"></script>
 </body>
